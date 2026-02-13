@@ -1,0 +1,6 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName =~ "cmd.exe" or FileName =~ "powershell.exe"
+| where (ProcessCommandLine contains "unzip" or ProcessCommandLine contains "rename" 
+    or ProcessCommandLine contains "wget" or ProcessCommandLine contains "Invoke-WebRequest")
+| project Timestamp, DeviceName, InitiatingProcessFileName, FileName, InitiatingProcessFolderPath, FolderPath, InitiatingProcessCommandLine, ProcessCommandLine

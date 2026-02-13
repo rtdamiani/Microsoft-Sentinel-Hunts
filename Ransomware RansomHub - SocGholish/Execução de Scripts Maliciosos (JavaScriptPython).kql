@@ -1,0 +1,8 @@
+DeviceEvents
+| where TimeGenerated > ago(30d)
+| where ActionType == "ProcessCreated" 
+| where (FileName =~ "wscript.exe" or FileName =~ "cscript.exe")
+    and (ProcessCommandLine contains ".js" or ProcessCommandLine contains ".jse")
+| extend ScriptName = extract(@"\\([^\\]+\.js)", 1, ProcessCommandLine)
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine, ScriptName
+| sort by Timestamp desc

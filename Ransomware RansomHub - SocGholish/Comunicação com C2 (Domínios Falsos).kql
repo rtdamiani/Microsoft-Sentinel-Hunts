@@ -1,0 +1,5 @@
+DeviceNetworkEvents
+| where TimeGenerated > ago(30d)
+| where RemoteUrl matches regex @"update.*\.(com|net|org|info)" 
+    and not(RemoteUrl endswith "microsoft.com" or RemoteUrl endswith "ctldl.windowsupdate.com" or RemoteUrl startswith @"http://ctldl.windowsupdate.com"  or RemoteUrl endswith "update.googleapis.com" or RemoteUrl endswith "download.windowsupdate.com" or RemoteUrl startswith "http://download.windowsupdate.com" or RemoteUrl startswith "download.windowsupdate.com" or RemoteUrl startswith "http://au.download.windowsupdate.com")
+| summarize ConnectionCount = count() by DeviceName, RemoteUrl, InitiatingProcessFileName

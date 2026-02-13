@@ -1,0 +1,12 @@
+let JSExecution = 
+    DeviceEvents
+	| where TimeGenerated > ago(30d)
+    | where ActionType == "ProcessCreated"
+    | where FileName =~ "wscript.exe" and ProcessCommandLine contains ".js";
+let PythonPayload = 
+    DeviceFileEvents
+	| where TimeGenerated > ago(30d)
+    | where FileName endswith ".pyz";
+JSExecution
+| join kind=inner PythonPayload on DeviceName
+| project Timestamp, DeviceName, JSCommandLine = ProcessCommandLine, PythonFile = FileName

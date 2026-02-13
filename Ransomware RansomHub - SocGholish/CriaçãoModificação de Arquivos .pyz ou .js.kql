@@ -1,0 +1,10 @@
+DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where ActionType == "FileCreated" or ActionType == "FileModified"
+| where (FileName endswith ".pyz" or FileName endswith ".js")
+    and (FolderPath contains "Temp" or FolderPath contains "Downloads")
+    | where InitiatingProcessFileName !in ("onedrive.exe","chrome.exe","brave.exe","msedge.exe","bizagimodeler.exe","onedrivesetup.exe","sensece.exe","opera.exe","msedgewebview2.exe")
+    | where InitiatingProcessFolderPath !in (@"c:\$windows.~bt\sources\setuphost.exe")
+| where InitiatingProcessCommandLine <> "TiWorker.exe -Embedding"
+| project Timestamp, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, FileName, InitiatingProcessFolderPath, FolderPath, InitiatingProcessCommandLine
+| sort by Timestamp desc

@@ -1,0 +1,6 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName =~ "pythonw.exe"
+| where ProcessCommandLine contains ".pyz" or InitiatingProcessCommandLine contains ".pyz" 
+    or ProcessCommandLine contains "fcrapvim" or InitiatingProcessCommandLine contains "fcrapvim"
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine
