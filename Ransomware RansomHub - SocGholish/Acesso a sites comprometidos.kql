@@ -1,0 +1,6 @@
+DeviceNetworkEvents
+| where TimeGenerated > ago(30d)
+| where InitiatingProcessFileName in~ ("msedge.exe", "chrome.exe", "firefox.exe")
+| where RemoteUrl endswith ".zip"
+| where RemoteUrl has_any ("update", "patch", "install")
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, RemoteUrl, InitiatingProcessCommandLine, ReportId
