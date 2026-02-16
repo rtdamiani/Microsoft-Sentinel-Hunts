@@ -1,6 +1,0 @@
-DeviceProcessEvents
-| where TimeGenerated > ago(30d)
-| where InitiatingProcessFileName has_any ("node", "nodejs")
-| where InitiatingProcessCommandLine has_any ("next", "react-scripts")
-| where FileName in ("sh", "bash", "curl", "wget", "python", "python3")
-| project TimeGenerated, DeviceName, InitiatingProcessCommandLine, ProcessCommandLine, FileName, InitiatingProcessParentFileName, ActionType

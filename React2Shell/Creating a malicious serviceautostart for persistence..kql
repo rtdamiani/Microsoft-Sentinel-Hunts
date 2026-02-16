@@ -1,7 +1,0 @@
-DeviceFileEvents
-| where TimeGenerated > ago(30d)
-| where ActionType == "FileCreated"
-| where FolderPath contains "/.config/systemd/user/" or FolderPath contains "/.config/autostart/"
-| where FileName endswith ".service" or FileName endswith ".desktop"
-| where InitiatingProcessFileName !in ("systemctl", "xdg-autostart-editor", "gnome-shell", "kdeinit5", "dbus-daemon")
-| project TimeGenerated, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, FolderPath, FileName

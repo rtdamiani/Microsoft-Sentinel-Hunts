@@ -1,4 +1,0 @@
-DeviceProcessEvents
-| where TimeGenerated > ago(30d)
-| where ProcessCommandLine contains "bash -i" and ProcessCommandLine contains ">& /dev/tcp/" and ProcessCommandLine contains "0>&1"
-| project TimeGenerated, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, ProcessCommandLine, FileName, ActionType
