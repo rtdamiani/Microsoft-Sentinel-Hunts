@@ -1,0 +1,10 @@
+DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where FileName =~ "applicationHost.config"
+| where FolderPath has @"inetsrv\config"
+| where ActionType in ("FileCreated", "FileModified", "FileAccessed")
+| where InitiatingProcessFileName !in~ ("svchost.exe", "w3wp.exe", "iisexpress.exe")
+| project TimeGenerated, DeviceName, InitiatingProcessParentFileName, InitiatingProcessFileName, FileName, InitiatingProcessFolderPath, FolderPath, InitiatingProcessCommandLine
+| where InitiatingProcessCommandLine <> "appcmd.exe uninstall module SCCMContentAuthModule"
+| where InitiatingProcessCommandLine <> "appcmd.exe  set config /section:httpLogging /dontLog:false /commit:apphost"
+| where InitiatingProcessCommandLine <> "\"InetMgr.exe\" "
