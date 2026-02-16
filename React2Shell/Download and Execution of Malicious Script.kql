@@ -1,0 +1,10 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where (FileName in ("curl", "wget") and ProcessCommandLine contains ".sh -o") or (FileName contains "python" and ProcessCommandLine contains "urllib.request")
+| extend DownloadedScriptPath = extract_all(@"-o\s+([^ ]+)|-O\s+([^ ]+)|open\('([^']+)'", ProcessCommandLine)[0]
+| join kind=inner (
+    DeviceProcessEvents
+    | where TimeGenerated > ago(30d)
+    | where FileName endswith ".sh"
+    | extend ExecutedScriptPath = ProcessCommandLine
+) on $left.DeviceName == $right.DeviceName
