@@ -1,0 +1,5 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName =~ "vssadmin.exe" or FileName =~ "wbadmin.exe"
+| where ProcessCommandLine has_any ("delete shadows", "delete catalog")
+| project TimeGenerated, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessCommandLine, AccountName

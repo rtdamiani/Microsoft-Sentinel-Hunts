@@ -1,0 +1,5 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName =~ "reg.exe" and ProcessCommandLine has "add"
+| where ProcessCommandLine has @"HKCU\Software\Classes\ms-settings\shell\open\command"
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, ProcessCommandLine, AccountName

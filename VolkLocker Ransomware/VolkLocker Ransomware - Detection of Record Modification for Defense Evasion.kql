@@ -1,0 +1,16 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName =~ "reg.exe" and ProcessCommandLine has "add"
+| where ProcessCommandLine has_any (
+    "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\ /v DisableAntiSpyware /t REG_DWORD /d 1 /f",
+    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\ /v DisableTaskMgr /t REG_DWORD /d 1 /f",
+    "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\ /v DisableTaskMgr /t REG_DWORD /d 1 /f",
+    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\ /v DisableRegistryTools /t REG_DWORD /d 1 /f",
+    "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\ /v DisableRegistryTools /t REG_DWORD /d 1 /f",
+    "HKCU\\Software\\Policies\\Microsoft\\Windows\\System\\ /v DisableCMD /t REG_DWORD /d 2 /f",
+    "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System\\ /v DisableCMD /t REG_DWORD /d 2 /f",
+    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\ /v NoRun /t REG_DWORD /d 1 /f",
+    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\ /v NoClose /t REG_DWORD /d 1 /f",
+    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\ /v NoDrives /t REG_DWORD /d 4 /f"
+)
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, ProcessCommandLine, AccountName
