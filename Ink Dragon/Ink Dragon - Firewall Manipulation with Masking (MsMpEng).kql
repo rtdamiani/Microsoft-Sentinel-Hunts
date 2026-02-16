@@ -1,0 +1,5 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where ProcessCommandLine has "netsh" and ProcessCommandLine has "advfirewall" and ProcessCommandLine has "add rule"
+| where ProcessCommandLine has_any ("MsMpEng", "Defender", "Microsoft Security")
+| project TimeGenerated, DeviceName, ProcessCommandLine, InitiatingProcessFileName

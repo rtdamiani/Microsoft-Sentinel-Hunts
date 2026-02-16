@@ -1,0 +1,5 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName =~ "cdb.exe"
+| where ProcessCommandLine has_all ("-cf", ".txt") or ProcessCommandLine has "-pd"
+| project TimeGenerated, DeviceName, ProcessCommandLine, InitiatingProcessFileName

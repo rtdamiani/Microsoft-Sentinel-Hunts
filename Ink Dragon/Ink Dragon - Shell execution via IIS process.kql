@@ -1,0 +1,7 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where InitiatingProcessFileName =~ "w3wp.exe"
+| where FileName in~ ("cmd.exe", "powershell.exe", "whoami.exe", "net.exe", "nltest.exe", "hostname.exe")
+| where ProcessCommandLine !contains @"\\SP05WEVO03\Evolutio\Environments\"
+| project TimeGenerated, DeviceName, FileName, ProcessCommandLine
+| where ProcessCommandLine <> "cmd.exe /c \"\"E:\\Program Files (x86)\\Johnson Controls\\RabbitMQ Server 3.8.16\\rabbitmq_server-3.8.16\\sbin\\rabbitmqctl.bat\" list_queues name head_message_timestamp messages\""

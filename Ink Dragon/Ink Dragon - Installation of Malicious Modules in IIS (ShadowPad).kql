@@ -1,0 +1,5 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where ProcessCommandLine has "appcmd.exe" and ProcessCommandLine has "install" and ProcessCommandLine has "module"
+| where ProcessCommandLine has_any ("bin", "inetpub", "Temp", @"Windows\Temp")
+| project TimeGenerated, DeviceName, ProcessCommandLine, InitiatingProcessParentFileName

@@ -1,0 +1,6 @@
+DeviceEvents
+| where TimeGenerated > ago(30d)
+| where ActionType == "OpenProcessApiCall"
+| where FileName =~ "lsass.exe"
+| where InitiatingProcessFileName in~ ("w3wp.exe", "procdump.exe", "rundll32.exe", "powershell.exe")
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine
