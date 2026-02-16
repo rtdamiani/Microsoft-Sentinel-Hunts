@@ -1,0 +1,5 @@
+DeviceNetworkEvents
+| where TimeGenerated > ago(30d)
+| where RemoteIP in ("45.32.158.54", "38.162.112.141", "193.24.123.68", "146.88.129.138", "115.42.60.223")
+   or RemoteUrl contains "reactcdn.windowserrorapis.com"
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, RemoteIP, RemotePort, RemoteUrl, ActionType
