@@ -1,0 +1,7 @@
+DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where ActionType in ("FileModified", "FileCreated")
+| where FileName in (".bashrc", ".profile", ".zshrc")
+| where FolderPath contains "/home/" or FolderPath contains "/root/"
+| where InitiatingProcessFileName !in ("bash", "sh", "zsh", "code", "vim", "nano", "git", "chsh", "sftp", "scp")
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, FolderPath, FileName, ActionType

@@ -1,0 +1,5 @@
+DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where ActionType == "FileCreated"
+| where FolderPath matches regex @".*\/(\.local\/share\/\.[0-9a-fA-F]{8,})"
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, FolderPath
