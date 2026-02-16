@@ -1,0 +1,5 @@
+DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where ActionType =~ "FileCreated" or ActionType =~ "FileRenamed"
+| where FileName endswith ".gm" or FileName endswith ".locked.gm" or FileName endswith ".cvolk"
+| project TimeGenerated, DeviceName, FileName, FolderPath, InitiatingProcessFileName, InitiatingProcessCommandLine
