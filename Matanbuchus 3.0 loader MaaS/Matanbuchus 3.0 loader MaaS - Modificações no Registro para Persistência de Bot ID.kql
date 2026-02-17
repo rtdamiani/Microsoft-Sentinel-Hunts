@@ -1,0 +1,7 @@
+DeviceEvents
+| where TimeGenerated > ago(30d)
+| where ActionType == "RegistryValueSet" or ActionType == "RegistryKeyCreated"
+| where RegistryKey has @"HKCU\SOFTWARE" and (RegistryKey contains "serial" or RegistryValueName contains "bot ID")
+| project TimeGenerated, DeviceName, RegistryKey, RegistryValueName, RegistryValueData, AccountName
+| summarize count() by DeviceName, RegistryKey
+| order by count_ desc

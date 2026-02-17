@@ -1,0 +1,7 @@
+DeviceEvents
+| where TimeGenerated > ago(30d)
+| where ActionType == "ScheduledTaskCreated"
+| where AdditionalFields contains "Update Tracker Task" or AdditionalFields contains "msiexec.exe -z"
+| project TimeGenerated, DeviceName, AccountName, FolderPath, AdditionalFields
+| summarize count() by DeviceName
+| order by count_ desc

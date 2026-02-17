@@ -1,0 +1,6 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName == "wmic.exe" and (ProcessCommandLine has "Win32_Product" or ProcessCommandLine has "process call create" or ProcessCommandLine has "/node:")
+| project TimeGenerated, DeviceName, FileName, ProcessCommandLine, AccountName
+| summarize count() by DeviceName, ProcessCommandLine
+| order by count_ desc

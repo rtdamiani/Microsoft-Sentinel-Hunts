@@ -1,0 +1,7 @@
+DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where (FileName endswith ".msi" or FileName endswith ".zip") and (FolderPath has "%TEMP%" or FolderPath has "%APPDATA%")
+| where ActionType in ("FileCreated", "FileModified", "FileExecuted")
+| project TimeGenerated, DeviceName, FileName, FolderPath, SHA256
+| summarize count() by DeviceName, FileName
+| order by count_ desc

@@ -1,0 +1,7 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName == "HRUpdate.exe" or (InitiatingProcessFileName == "HRUpdate.exe" and FileName endswith ".dll")
+| where FolderPath !contains "Program Files"
+| project TimeGenerated, DeviceName, FileName, FolderPath, ProcessCommandLine, AccountName
+| summarize count() by DeviceName, FileName
+| order by count_ desc

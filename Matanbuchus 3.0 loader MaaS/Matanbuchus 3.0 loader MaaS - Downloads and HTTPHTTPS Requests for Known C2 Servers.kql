@@ -1,0 +1,7 @@
+DeviceNetworkEvents
+| where TimeGenerated > ago(30d)
+| where RemoteUrl has_any ("mechiraz.com", "gpa-cro.com", "/cart/checkout/files/update_info.aspx")
+| where Protocol == "Http" or Protocol == "Https"
+| project TimeGenerated, DeviceName, RemoteUrl, RemoteIP, InitiatingProcessFileName, ActionType
+| summarize count() by DeviceName, RemoteUrl
+| order by count_ desc

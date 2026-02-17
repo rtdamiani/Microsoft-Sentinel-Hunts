@@ -1,0 +1,7 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where ProcessCommandLine has_any ("msiexec.exe -z", "%APPDATA%", @"SysWOW64\msiexec.exe")
+| where InitiatingProcessFileName !contains "legitimate"
+| project TimeGenerated, DeviceName, FileName, ProcessCommandLine, FolderPath, AccountName
+| summarize count() by DeviceName, ProcessCommandLine
+| order by count_ desc
