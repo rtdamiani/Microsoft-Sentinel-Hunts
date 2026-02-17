@@ -1,0 +1,9 @@
+DeviceEvents
+| where TimeGenerated > ago(30d)
+| where ActionType in ("ScheduledTaskCreated","ScheduledTaskModified")
+| extend AF = parse_json(AdditionalFields)
+| extend TaskName = tostring(AF.TaskName), TaskXml = tostring(AF.TaskXml), TaskPath = tostring(AF.TaskPath), Command = tostring(AF.Command), Arguments = tostring(AF.Arguments)
+| where TaskXml has_any (@"\AppData\Local\Temp\", @"\AppData\Roaming\", @"\AppData\Local\") or Command has_any (@"\AppData\Local\Temp\", @"\AppData\Roaming\", @"\AppData\Local\") or Arguments has_any (@"\AppData\Local\Temp\", @"\AppData\Roaming\", @"\AppData\Local\")
+| project TimeGenerated, DeviceName, ActionType, TaskName, TaskPath, Command, Arguments,
+          InitiatingProcessFileName, InitiatingProcessCommandLine, InitiatingProcessAccountName
+| order by TimeGenerated desc
