@@ -1,0 +1,13 @@
+let browserDirs = pack_array(@"\Google\Chrome\User Data\", @"\Microsoft\Edge\User Data\", @"\Mozilla\Firefox\Profiles\");  
+let browserSensitiveFiles = pack_array("Web Data", "Login Data", "key4.db", "formhistory.sqlite", "cookies.sqlite", "logins.json", "places.sqlite", "cert9.db"); 
+DeviceEvents 
+| where TimeGenerated > ago(30d)
+| where AdditionalFields has_any ("FileOpenSource") // Filter for "File Open" events. 
+| where InitiatingProcessVersionInfoInternalFileName == "AutoIt3.exe" 
+      or InitiatingProcessFolderPath has "\\windows\\microsoft.net\\framework\\" 
+      or InitiatingProcessFileName =~ "powershell.exe" 
+| where (AdditionalFields has_any(browserDirs) or  AdditionalFields has_any(browserSensitiveFiles))  
+| extend json = parse_json(AdditionalFields) 
+| extend File_Name = tostring(json.FileName.PropertyValue) 
+| where (File_Name has_any (browserDirs) and File_Name has_any (browserSensitiveFiles)) 
+| project Timestamp, ReportId, DeviceId, InitiatingProcessParentFileName, InitiatingProcessFileName, InitiatingProcessVersionInfoInternalFileName, InitiatingProcessCommandLine, File_Name
