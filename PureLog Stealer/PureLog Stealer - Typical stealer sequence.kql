@@ -1,0 +1,22 @@
+DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where ActionType in ("FileRead","FileAccessed","FileCreated","FileModified")
+| where FolderPath has_any (
+    @"\User Data\Local State",
+    @"\User Data\Default\Login Data",
+    @"\User Data\Default\Cookies",
+    @"\User Data\Web Data"
+)
+| extend Artifact =
+    case(
+        FolderPath has @"\User Data\Local State", "Local State",
+        FolderPath has @"\User Data\Default\Login Data", "Login Data",
+        FolderPath has @"\User Data\Default\Cookies", "Cookies",
+        FolderPath has @"\User Data\Web Data", "Web Data",
+        "Other"
+    )
+| summarize Artifacts=make_set(Artifact), FirstSeen=min(TimeGenerated), LastSeen=max(TimeGenerated), Hits=count()
+    by DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, InitiatingProcessAccountName
+| where Artifacts has "Local State" and (Artifacts has "Login Data" or Artifacts has "Cookies" or Artifacts has "Web Data")
+| where LastSeen - FirstSeen < 10m
+| order by LastSeen desc

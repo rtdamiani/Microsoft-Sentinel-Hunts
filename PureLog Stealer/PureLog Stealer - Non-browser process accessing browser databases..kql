@@ -1,0 +1,18 @@
+
+let BrowserPaths = dynamic([
+  @"\User Data\Default\Login Data",
+  @"\User Data\Default\Cookies",
+  @"\User Data\Web Data",
+  @"\User Data\Local State",
+  @"\Profiles\key4.db",
+  @"\Profiles\logins.json",
+  @"\Profiles\cookies.sqlite"
+]);
+DeviceFileEvents
+| where ActionType in ("FileCreated", "FileModified", "FileRead", "FileAccessed")
+| where FolderPath has_any (BrowserPaths)
+| where InitiatingProcessFileName !in~ ("chrome.exe","msedge.exe","brave.exe","opera.exe","firefox.exe")
+| project Timestamp, DeviceName, ActionType, FolderPath, FileName,
+          InitiatingProcessFileName, InitiatingProcessCommandLine,
+          InitiatingProcessParentFileName, InitiatingProcessAccountName
+| order by Timestamp desc

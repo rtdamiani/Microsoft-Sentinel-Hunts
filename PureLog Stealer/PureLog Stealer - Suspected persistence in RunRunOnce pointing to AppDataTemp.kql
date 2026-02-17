@@ -1,0 +1,10 @@
+DeviceEvents
+| where TimeGenerated > ago(30d)
+| where ActionType in ("RegistryValueSet","RegistryKeyCreated")
+| extend AF = parse_json(AdditionalFields)
+| extend RegistryKey = tostring(AF.RegistryKey), RegistryValueName = tostring(AF.RegistryValueName), RegistryValueData = tostring(AF.RegistryValueData)
+| where RegistryKey has_any (@"\Software\Microsoft\Windows\CurrentVersion\Run", @"\Software\Microsoft\Windows\CurrentVersion\RunOnce")
+| where RegistryValueData has_any (@"\AppData\Local\Temp\", @"\AppData\Roaming\", @"\AppData\Local\")
+| project TimeGenerated, DeviceName, ActionType, RegistryKey, RegistryValueName, RegistryValueData,
+          InitiatingProcessFileName, InitiatingProcessCommandLine, InitiatingProcessAccountName
+| order by TimeGenerated desc

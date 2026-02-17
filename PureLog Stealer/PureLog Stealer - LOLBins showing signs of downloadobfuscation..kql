@@ -1,0 +1,11 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName in~ ("powershell.exe","pwsh.exe","cmd.exe","wscript.exe","cscript.exe","mshta.exe","rundll32.exe","regsvr32.exe")
+| where ProcessCommandLine has_any ("DownloadString","Invoke-WebRequest","iwr ","curl ","wget ","FromBase64String","-enc","-encodedcommand","bitsadmin","certutil")
+| where InitiatingProcessFileName !in ("teams.exe","onedrivesetup.exe","ms-teams.exe")
+| where ProcessCommandLine !contains "IABbAEUAbgB2AGkAcgBvAG4AbQBlAG4AdABdADoA" and ProcessCommandLine !contains "JABFAHIAcgBvAHIAQQBjAHQAaQBvAG4AUAByAGUAZgBlAHIAZ"
+| where ProcessCommandLine != @"powershell  -command ""& { Try { (Invoke-WebRequest -Uri 'http://169.254.169.254/latest/dynamic/instance-identity/document' -TimeoutSec 5 -UseBasicParsing).Content } Catch {} }"" "
+| where ProcessCommandLine != @"powershell  -command ""& { Try { (Invoke-WebRequest -Uri 'http://[fd00:ec2::254]/latest/dynamic/instance-identity/document' -TimeoutSec 5 -UseBasicParsing).Content } Catch {} }"" "
+| project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine,
+          InitiatingProcessParentFileName, InitiatingProcessCommandLine
+| order by Timestamp desc
