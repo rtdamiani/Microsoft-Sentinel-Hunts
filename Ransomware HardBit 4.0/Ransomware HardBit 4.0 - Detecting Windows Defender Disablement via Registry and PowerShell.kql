@@ -1,0 +1,19 @@
+DeviceRegistryEvents
+| where TimeGenerated >= ago(30d)
+| where RegistryKey has_any (
+    @"HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows Defender\Features\TamperProtection",
+    @"HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\DisableAntiSpyware",
+    @"HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection\DisableBehaviorMonitoring",
+    @"HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection\DisableOnAccessProtection",
+    @"HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection\DisableScanOnRealtimeEnable"
+)
+| where RegistryValueData == "1"
+| project TimeGenerated, DeviceName, RegistryKey, RegistryValueName, RegistryValueData, InitiatingProcessFileName, InitiatingProcessCommandLine
+| union (
+    DeviceProcessEvents
+    | where TimeGenerated >= ago(30d)
+    | where FileName =~ "powershell.exe"
+    | where ProcessCommandLine has "Set-MpPreference"
+    and ProcessCommandLine has_any ("-DisableBlockAtFirstSeen", "-DisableScriptScanning", "-DisableRealtimeMonitoring", "-DisableOnAccessProtection")
+    | project TimeGenerated, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName, AccountName
+)
