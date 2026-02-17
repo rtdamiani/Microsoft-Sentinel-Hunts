@@ -1,0 +1,6 @@
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where FileName in~ ("ru.bat","go.exe","go2.exe","go3.exe","bb.exe","av-1m.exe","crazyhunter.exe")
+| summarize Devices=dcount(DeviceName), Total=count(), SampleDevices=make_set(DeviceName, 1)
+          by FileName, InitiatingProcessAccountName
+| order by Devices desc, Total desc
