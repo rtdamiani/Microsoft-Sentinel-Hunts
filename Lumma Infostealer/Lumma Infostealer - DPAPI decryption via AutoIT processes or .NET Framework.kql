@@ -1,0 +1,13 @@
+DeviceEvents
+| where TimeGenerated > ago(30d)
+| where ActionType == "DpapiAccessed"
+| where InitiatingProcessVersionInfoInternalFileName == "AutoIt3.exe"
+      or InitiatingProcessFolderPath has "\\windows\\microsoft.net\\framework\\"
+      or InitiatingProcessFileName =~ "powershell.exe"
+| where (AdditionalFields has_any("Google Chrome", "Microsoft Edge") and AdditionalFields has_any("SPCryptUnprotect"))
+| extend json = parse_json(AdditionalFields)
+| extend dataDesp = tostring(json.DataDescription.PropertyValue)
+| extend opType = tostring(json.OperationType.PropertyValue)
+| where dataDesp in~ ("Google Chrome", "Microsoft Edge", "Chromium", "Opera", "Opera GX", "IMAP Password", "Brave Browser", "AVG Secure Browser") 
+        and opType =~ "SPCryptUnprotect"
+| project Timestamp, ReportId, DeviceId, ActionType, InitiatingProcessParentFileName, InitiatingProcessFileName, InitiatingProcessVersionInfoInternalFileName, InitiatingProcessCommandLine, AdditionalFields, dataDesp, opType

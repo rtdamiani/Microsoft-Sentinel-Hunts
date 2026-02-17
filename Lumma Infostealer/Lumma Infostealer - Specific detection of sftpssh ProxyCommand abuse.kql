@@ -1,0 +1,5 @@
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where FileName in~ ("sftp.exe","ssh.exe")
+| where ProcessCommandLine has "ProxyCommand"
+| project Timestamp, DeviceName, AccountName, FileName, InitiatingProcessFileName, InitiatingProcessCommandLine, ProcessCommandLine

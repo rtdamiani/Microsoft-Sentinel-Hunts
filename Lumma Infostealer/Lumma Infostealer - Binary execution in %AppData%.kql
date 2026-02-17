@@ -1,0 +1,5 @@
+DeviceFileEvents
+| where Timestamp > ago(30d)
+| where FolderPath has @"\AppData\Roaming\"
+| where FileName =~ "ArtistSponsorship.exe"
+| project Timestamp, DeviceName, FolderPath, FileName, SHA256, InitiatingProcessFileName, InitiatingProcessCommandLine

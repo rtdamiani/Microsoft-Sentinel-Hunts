@@ -1,0 +1,5 @@
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where InitiatingProcessFileName in~ ("ssh.exe","sftp.exe")
+| where FileName in~ ("powershell.exe","mshta.exe","cmd.exe")
+| project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, InitiatingProcessCommandLine, FileName, ProcessCommandLine

@@ -1,0 +1,5 @@
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where FileName =~ "mshta.exe"
+| where ProcessCommandLine has_any ("http://","https://")
+| project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, ProcessCommandLine
