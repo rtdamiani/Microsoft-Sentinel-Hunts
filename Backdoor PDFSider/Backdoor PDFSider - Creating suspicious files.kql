@@ -1,0 +1,6 @@
+DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where FileName =~ "cryptbase.dll" or FileName =~ "pdf24.exe"
+| where FolderPath contains @"AppData\Roaming" or FolderPath contains "Temp"
+| where ActionType == "FileCreated" or ActionType == "FileModified"
+| project Timestamp, DeviceName, FileName, FolderPath, InitiatingProcessCommandLine
