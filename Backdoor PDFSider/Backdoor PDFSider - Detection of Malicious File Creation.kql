@@ -1,0 +1,8 @@
+DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where InitiatingProcessFileName  has_any ("AcroRd32.exe", "FoxitReader.exe", "SumatraPDF.exe", "rundll32.exe")
+| where FolderPath has_any ("%temp%", "%appdata%", @"\AppData\Local\Temp", @"\AppData\Roaming")
+| where FileName has_any (".dll", ".exe", ".bat", ".ps1", ".vbs")
+| where ActionType == "FileCreated"
+| where InitiatingProcessCommandLine !contains "zzzzInvokeManagedCustomActionOutOfProc"
+| project TimeGenerated, DeviceName, InitiatingProcessParentFileName, InitiatingProcessFileName, FileName, InitiatingProcessFolderPath, FolderPath, InitiatingProcessCommandLine

@@ -1,0 +1,5 @@
+DeviceRegistryEvents
+| where TimeGenerated > ago(30d)
+| where RegistryKey contains @"Software\Microsoft\Windows\CurrentVersion\Run"
+| where RegistryValueData contains "pdf24.exe"
+| project Timestamp, DeviceName, RegistryKey, RegistryValueName, RegistryValueData, InitiatingProcessCommandLine

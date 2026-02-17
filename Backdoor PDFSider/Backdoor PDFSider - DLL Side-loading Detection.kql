@@ -1,0 +1,6 @@
+DeviceImageLoadEvents
+| where TimeGenerated > ago(30d)
+| where InitiatingProcessFileName =~ "pdf24.exe"
+| where FileName =~ "cryptbase.dll"
+| where FolderPath !contains @"Windows\System32"
+| project Timestamp, DeviceName, InitiatingProcessFileName, FileName, FolderPath, InitiatingProcessCommandLine

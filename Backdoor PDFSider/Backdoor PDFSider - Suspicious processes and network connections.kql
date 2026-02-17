@@ -1,0 +1,11 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName =~ "pdf24.exe"
+| join kind=leftouter (
+    DeviceNetworkEvents
+    | where TimeGenerated > ago(30d)
+    | where InitiatingProcessFileName =~ "pdf24.exe"
+    | project NetworkTimestamp=Timestamp, RemoteIP, RemotePort, RemoteUrl, InitiatingProcessCommandLine
+) on InitiatingProcessCommandLine
+| where isnotempty(NetworkTimestamp) or (FileName =~ "pdf24.exe" and InitiatingProcessCommandLine contains "run")
+| project Timestamp, DeviceName, FileName, InitiatingProcessCommandLine, NetworkTimestamp, RemoteIP, RemotePort, RemoteUrl

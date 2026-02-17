@@ -1,0 +1,6 @@
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName  has_any ("cmd.exe", "powershell.exe")
+| where ProcessCommandLine  has_any ("tasklist", "Get-Process", "wmic process", "Get-WmiObject", "reg query", "systeminfo", "ipconfig")
+| where InitiatingProcessFileName  has_any ("AcroRd32.exe", "FoxitReader.exe", "SumatraPDF.exe")
+| project TimeGenerated, DeviceName
