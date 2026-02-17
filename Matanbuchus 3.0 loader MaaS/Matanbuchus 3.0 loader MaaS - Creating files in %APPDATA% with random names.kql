@@ -1,0 +1,7 @@
+DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where FolderPath has "%APPDATA%" and FileName matches regex @"^[a-z]{12}.exe$"
+| where ActionType in ("FileCreated", "FileModified")
+| project TimeGenerated, DeviceName, FileName, FolderPath, SHA256
+| summarize count() by DeviceName, FolderPath
+| order by count_ desc
