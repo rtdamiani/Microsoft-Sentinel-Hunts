@@ -1,0 +1,7 @@
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where FileName in~ ("netsh.exe")
+| where ProcessCommandLine has_all ("interface", "portproxy")
+| where ProcessCommandLine has_any ("add", "set", "v4tov4", "listenport", "connectport")
+| project Timestamp, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by Timestamp desc

@@ -1,0 +1,5 @@
+DeviceEvents
+| where Timestamp > ago(30d)
+| where tostring(AdditionalFields) has "zam64.sys" or tostring(AdditionalFields) has "zam64"
+| project Timestamp, DeviceName, ActionType, InitiatingProcessAccountName, InitiatingProcessFileName, InitiatingProcessCommandLine, AdditionalFields
+| order by Timestamp desc

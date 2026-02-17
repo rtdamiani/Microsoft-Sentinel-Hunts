@@ -1,0 +1,7 @@
+DeviceFileEvents
+| where Timestamp > ago(30d)
+| where FolderPath startswith @"\"
+| where FolderPath has_any (@"\SYSVOL", @"\NETLOGON", @"\ADMIN$", @"\C$")
+| where ActionType in ("FileCreated","FileModified","FileRenamed")
+| project Timestamp, DeviceName, FolderPath, FileName, SHA256, InitiatingProcessAccountName, InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by Timestamp desc

@@ -1,0 +1,17 @@
+let ExecWindow = 30m;
+let exec =
+    DeviceProcessEvents
+    | where Timestamp > ago(30d)
+    | where FileName in~ ("go3.exe","crazyhunter.exe")
+    | project DeviceName, ExecTime=Timestamp, Proc=FileName, ProcPath=FolderPath, ProcCmd=ProcessCommandLine, Account=AccountName;
+let burst =
+    DeviceFileEvents
+    | where Timestamp > ago(30d)
+    | where ActionType in ("FileCreated","FileModified","FileRenamed")
+    | summarize FileOps=count() by DeviceName, bin(Timestamp, ExecWindow);
+exec
+| join kind=inner burst on DeviceName
+| where Timestamp between (ExecTime .. ExecTime + ExecWindow)
+| where FileOps > 2000
+| project ExecTime, Timestamp, DeviceName, Account, Proc, ProcPath, ProcCmd, FileOps
+| order by FileOps desc

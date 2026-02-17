@@ -1,0 +1,6 @@
+DeviceFileEvents
+| where Timestamp > ago(30d)
+| where ActionType in ("FileCreated","FileRenamed","FileModified")
+| where FileName endswith ".hunter" or FolderPath endswith ".hunter" or FolderPath contains ".hunter"
+| summarize Total=count(), FirstSeen=min(Timestamp), LastSeen=max(Timestamp) by DeviceName
+| order by Total desc
