@@ -1,0 +1,11 @@
+DeviceProcessEvents
+| where TimeGenerated >= ago(30d)
+| where FileName =~ "cmd.exe" or FileName =~ "powershell.exe"
+| where ProcessCommandLine has_any (
+    "vssadmin delete shadows /all /quiet",
+    "bcdedit /set {default} bootstatuspolicy ignoreallfailures",
+    "bcdedit /set {default} recoveryenabled no",
+    "wbadmin delete catalog -quiet",
+    "wmic shadowcopy delete"
+)
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, FileName, ProcessCommandLine

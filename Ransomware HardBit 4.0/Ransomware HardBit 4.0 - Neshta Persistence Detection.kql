@@ -1,0 +1,13 @@
+DeviceFileEvents
+| where TimeGenerated >= ago(30d)
+| where ActionType == "FileCreated"
+| where FileName =~ "svchost.com"
+| where FolderPath =~ @"C:\Windows" // %SYSTEMROOT%
+| project TimeGenerated, DeviceName, FileName, FolderPath, InitiatingProcessFileName, InitiatingProcessCommandLine
+| union (
+   DeviceRegistryEvents
+    | where TimeGenerated >= ago(30d)
+    | where RegistryKey =~ @"HKLM\SOFTWARE\Classes\exefile\shell\open\command"
+    | where RegistryValueData has "svchost.com"
+    | project TimeGenerated, DeviceName, RegistryKey, RegistryValueName, RegistryValueData, InitiatingProcessFileName, InitiatingProcessCommandLine
+)

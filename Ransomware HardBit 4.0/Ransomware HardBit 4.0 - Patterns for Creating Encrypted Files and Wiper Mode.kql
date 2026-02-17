@@ -1,0 +1,17 @@
+let SuspiciousExtensions = dynamic([".locked", ".crypt", ".enc", ".hardbit"]);
+let TimeFrame = 1h;
+let MinFileCount = 100;
+DeviceFileEvents
+| where TimeGenerated >= ago(30d)
+| where ActionType == "FileCreated"
+| where FileName has_any (SuspiciousExtensions)
+| summarize FileCount = count() by DeviceName, InitiatingProcessFileName, bin(TimeGenerated, 5m)
+| where FileCount >= MinFileCount
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, FileCount
+| union (
+    DeviceFileEvents
+    | where TimeGenerated >= ago(7d)
+    | where FileName =~ "hard.txt"
+    | where ActionType == "FileCreated" or ActionType == "FileModified"
+    | project TimeGenerated, DeviceName, FileName, FolderPath, InitiatingProcessFileName, InitiatingProcessCommandLine
+)

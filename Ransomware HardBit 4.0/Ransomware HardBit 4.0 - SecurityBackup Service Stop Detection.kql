@@ -1,0 +1,8 @@
+DeviceProcessEvents
+| where TimeGenerated >= ago(30d)
+| where FileName =~ "net.exe"
+| where ProcessCommandLine has "stop"
+| where ProcessCommandLine has_any (
+    "DefWatch", "Symantec System Recovery", "##WID", "ARSM", "AcrSch2Svc", "AcronisAgent"
+)
+| project TimeGenerated, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName, AccountName
