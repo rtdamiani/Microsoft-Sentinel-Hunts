@@ -1,0 +1,28 @@
+//Detects suspicious use of nslookup for anomalous DNS queries, indicating possible abuse for payload download/execution, C2 via DNS, or malicious activity associated with campaigns like ClickFix.
+let NslookupIPs =
+DeviceProcessEvents
+| union DeviceNetworkEvents
+| union DeviceEvents
+| union SecurityEvent
+| where (InitiatingProcessCommandLine has "nslookup" and InitiatingProcessCommandLine has "findstr") or (CommandLine has "nslookup" and CommandLine has "findstr")
+| extend IPInitiatingProcessCommandLine = extract("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})", 1, InitiatingProcessCommandLine)
+| extend IPProcessCommandLine = extract("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})", 1, ProcessCommandLine)
+| extend IPCommandLine = extract("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})", 1, CommandLine)
+| where isnotempty(IPInitiatingProcessCommandLine) and not(ipv4_is_private(IPInitiatingProcessCommandLine)) or isnotempty(IPProcessCommandLine) and not(ipv4_is_private(IPProcessCommandLine)) or isnotempty(IPCommandLine) and not(ipv4_is_private(IPCommandLine))
+| project-reorder TimeGenerated, DeviceName, AccountName, InitiatingProcessParentFileName, InitiatingProcessFileName, FileName, InitiatingProcessFolderPath, FolderPath, IPInitiatingProcessCommandLine, IPProcessCommandLine, IPCommandLine, InitiatingProcessCommandLine, ProcessCommandLine, RemoteIP, RemoteUrl, Account, NewProcessName, ProcessName, Process, Computer;
+let NslookupOfuscated =
+DeviceProcessEvents
+| union DeviceNetworkEvents
+| union DeviceEvents
+| union SecurityEvent
+| extend DeobfuscatedInitiatingProcessCommandLine = tostring(parse_command_line(tolower(InitiatingProcessCommandLine),"windows"))
+| extend DeobfuscatedProcessCommandLine = tostring(parse_command_line(tolower(ProcessCommandLine),"windows"))
+| extend DeobfuscatedCommandLine = tostring(parse_command_line(tolower(CommandLine),"windows"))
+| where (DeobfuscatedInitiatingProcessCommandLine has "nslookup" and DeobfuscatedInitiatingProcessCommandLine has "findstr") or (DeobfuscatedProcessCommandLine has "nslookup" and DeobfuscatedProcessCommandLine has "findstr") or (DeobfuscatedCommandLine has "nslookup" and DeobfuscatedCommandLine has "findstr")
+| extend IPInitiatingProcessCommandLine = extract("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})", 1, DeobfuscatedInitiatingProcessCommandLine)
+| extend IPProcessCommandLine = extract("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})", 1, DeobfuscatedProcessCommandLine)
+| extend IPCommandLine = extract("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})", 1, DeobfuscatedCommandLine)
+| where isnotempty(IPInitiatingProcessCommandLine) and not(ipv4_is_private(IPInitiatingProcessCommandLine)) or isnotempty(IPProcessCommandLine) and not(ipv4_is_private(IPProcessCommandLine)) or isnotempty(IPCommandLine) and not(ipv4_is_private(IPCommandLine))
+| project-reorder TimeGenerated, DeviceName, AccountName, InitiatingProcessParentFileName, InitiatingProcessFileName, FileName, InitiatingProcessFolderPath, FolderPath, DeobfuscatedInitiatingProcessCommandLine, DeobfuscatedProcessCommandLine, DeobfuscatedCommandLine, IPInitiatingProcessCommandLine, IPProcessCommandLine, IPCommandLine, InitiatingProcessCommandLine, ProcessCommandLine, RemoteIP, RemoteUrl, Account, NewProcessName, ProcessName, Process, Computer;
+union NslookupIPs,NslookupOfuscated
+| project-reorder TimeGenerated, DeviceName, AccountName, InitiatingProcessParentFileName, InitiatingProcessFileName, FileName, InitiatingProcessFolderPath, FolderPath, DeobfuscatedInitiatingProcessCommandLine, DeobfuscatedProcessCommandLine, DeobfuscatedCommandLine, IPInitiatingProcessCommandLine, IPProcessCommandLine, IPCommandLine, InitiatingProcessCommandLine, ProcessCommandLine, RemoteIP, RemoteUrl, Account, NewProcessName, ProcessName, Process, Computer

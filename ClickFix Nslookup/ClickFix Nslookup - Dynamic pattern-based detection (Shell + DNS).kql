@@ -1,0 +1,18 @@
+//Uses dynamic lists to identify hidden shells combined with DNS commands (nslookup/findstr).
+let TimeWindow = 30d;
+let ShellPatterns = dynamic([
+  "powershell.exe -w hidden",
+  "powershell -windowstyle hidden",
+  "powershell -nop -w hidden -ep bypass",
+  "cmd /c",
+  "cmd.exe /c"
+]);
+let DnsPatterns = dynamic([
+  "nslookup",
+  "nslookup.exe",
+  "findstr \"^Name:\""
+]);
+DeviceProcessEvents
+| where TimeGenerated > ago(TimeWindow)
+| where ProcessCommandLine has_any (ShellPatterns)
+| where ProcessCommandLine has_any (DnsPatterns)

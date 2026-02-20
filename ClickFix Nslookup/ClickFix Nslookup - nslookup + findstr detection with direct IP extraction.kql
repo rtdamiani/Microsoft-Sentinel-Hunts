@@ -1,0 +1,6 @@
+//Searches for processes that execute nslookup and findstr together and extracts public IPs from the command line.
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where InitiatingProcessCommandLine has "nslookup" and InitiatingProcessCommandLine has "findstr"
+| extend IP = extract("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})", 1, InitiatingProcessCommandLine)
+| where not(ipv4_is_private(IP))

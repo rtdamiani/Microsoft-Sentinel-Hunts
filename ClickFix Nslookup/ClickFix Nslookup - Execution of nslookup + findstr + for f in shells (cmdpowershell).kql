@@ -1,0 +1,6 @@
+//Detects chained use of nslookup, findstr, for /f and pipe to cmd, typical of automated scripts.
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FileName =~ "cmd.exe" or FileName =~ "powershell.exe" or InitiatingProcessFileName =~ "cmd.exe" or InitiatingProcessFileName =~ "powershell.exe"
+| where ProcessCommandLine has "nslookup" and ProcessCommandLine has "findstr" and ProcessCommandLine has "for /f" and ProcessCommandLine has "| cmd" or
+InitiatingProcessCommandLine has "nslookup" and InitiatingProcessCommandLine has "findstr" and InitiatingProcessCommandLine has "for /f" and InitiatingProcessCommandLine has "| cmd"

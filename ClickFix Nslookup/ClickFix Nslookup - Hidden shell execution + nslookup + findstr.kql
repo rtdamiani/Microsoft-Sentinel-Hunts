@@ -1,0 +1,11 @@
+//Identifies the use of hidden cmd/powershell with suspicious parameters and DNS queries filtered by findstr "^name:".
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| extend cmd = tolower(ProcessCommandLine)
+| where
+    (
+      cmd has "cmd.exe /c" or cmd has "cmd /c"
+      or (cmd has "powershell" and (cmd has "-w hidden" or cmd has "-windowstyle hidden"))
+      or (cmd has "powershell" and cmd has "-nop" and cmd has "-ep bypass" and cmd has "hidden")
+    )
+| where cmd has "nslookup" and (cmd has "findstr" and cmd has "^name:")
