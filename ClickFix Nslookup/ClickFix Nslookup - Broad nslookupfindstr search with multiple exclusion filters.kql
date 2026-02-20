@@ -1,0 +1,14 @@
+//Searches for any use of nslookup or findstr in processes or initiators, removing many known false positives.
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where InitiatingProcessCommandLine has "nslookup" or InitiatingProcessCommandLine has "findstr" or ProcessCommandLine has "nslookup" or ProcessCommandLine has "findstr"
+| where not(
+    AccountName startswith "lenovo_tmp" and
+    InitiatingProcessParentFileName == "fwdetect_v63.exe"
+            )
+| where not(
+    AccountName startswith "lenovo_tmp" and
+    InitiatingProcessFileName == "fwdetect_v63.exe"
+            )
+| where ProcessCommandLine != @"findstr  /i ""Image Name:   Secure System"" " and ProcessCommandLine != @"FindStr  /L \Google\GoogleUpdater " and ProcessCommandLine != @"findstr  /I /R /C:""\<.*\.config$"" " and ProcessCommandLine != @"findstr  /i ""DEMAND_START"" " and ProcessCommandLine != @"findstr  MEIx64" and ProcessCommandLine != @"driverquery  /fo list " and ProcessCommandLine != @"""cmd.exe"" /C driverquery /fo list | findstr MEIx64" and ProcessCommandLine != @"findstr  Intel(R)" and ProcessCommandLine != @"wmic  cpu get name " and ProcessCommandLine != @"""cmd.exe"" /C wmic cpu get name | findstr Intel(R)" and ProcessCommandLine != @"conhost.exe 0xffffffff -ForceV1"
+| project-reorder TimeGenerated, ActionType, DeviceName, AccountName, InitiatingProcessParentFileName, InitiatingProcessFileName, FileName, InitiatingProcessFolderPath, FolderPath, InitiatingProcessCommandLine, ProcessCommandLine, AdditionalFields
